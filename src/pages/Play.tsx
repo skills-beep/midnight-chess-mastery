@@ -338,6 +338,8 @@ const Play = () => {
                             onSquareClick={handleSquareClick}
                             whiteInCheck={whiteInCheck}
                             blackInCheck={blackInCheck}
+                            boardTheme={boardTheme}
+                            pieceSet={pieceSet}
                           />
                         </div>
                         

@@ -70,6 +70,27 @@ export default {
 				chessLegalMove: 'rgba(0, 128, 0, 0.3)',
 				chessSelected: 'rgba(0, 0, 255, 0.3)',
 				chessCheck: 'rgba(255, 0, 0, 0.5)',
+				// New theme colors
+				chessPurple: {
+					light: '#D6BCFA',
+					dark: '#9B87F5',
+				},
+				chessBlue: {
+					light: '#BEE3F8',
+					dark: '#3182CE',
+				},
+				chessEmerald: {
+					light: '#ADEFD1',
+					dark: '#00A36C',
+				},
+				chessCoral: {
+					light: '#FFE4B5',
+					dark: '#CD5C5C',
+				},
+				chessMidnight: {
+					light: '#DEE3E6',
+					dark: '#556877',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -109,6 +130,19 @@ export default {
 				'float-in': {
 					'0%': { transform: 'translateY(20px)', opacity: '0' },
 					'100%': { transform: 'translateY(0)', opacity: '1' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'pulse-glow': {
+					'0%, 100%': { opacity: '0.6' },
+					'50%': { opacity: '1' }
+				},
+				'chess-piece-float': {
+					'0%': { transform: 'translateY(0) rotate(0deg)' },
+					'50%': { transform: 'translateY(-15px) rotate(5deg)' },
+					'100%': { transform: 'translateY(0) rotate(0deg)' }
 				}
 			},
 			animation: {
@@ -117,7 +151,10 @@ export default {
 				'piece-move': 'piece-move 0.3s ease-out forwards',
 				'winner-celebration': 'winner-celebration 1s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
-				'float-in': 'float-in 0.5s ease-out'
+				'float-in': 'float-in 0.5s ease-out',
+				'float': 'float 3s ease-in-out infinite',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+				'chess-piece-float': 'chess-piece-float 6s ease-in-out infinite'
 			}
 		}
 	},

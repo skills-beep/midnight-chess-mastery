@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { ChessPiece, ChessSquare, PieceColor, ChessBoard as BoardType, getLegalMoves } from "@/lib/chess-engine";
 import ChessPieceComponent from "./ChessPiece";
+import { motion } from "framer-motion";
+import { BoardTheme, PieceSet } from "./ThemeCustomizer";
 
 interface ChessBoardProps {
   board: BoardType;
@@ -11,7 +13,19 @@ interface ChessBoardProps {
   onSquareClick: (row: number, col: number) => void;
   whiteInCheck: boolean;
   blackInCheck: boolean;
+  boardTheme?: BoardTheme;
+  pieceSet?: PieceSet;
 }
+
+// Theme color mapping
+const boardThemes = {
+  classic: { light: '#F0D9B5', dark: '#B58863' },
+  emerald: { light: '#ADEFD1', dark: '#00A36C' },
+  midnight: { light: '#DEE3E6', dark: '#556877' },
+  coral: { light: '#FFE4B5', dark: '#CD5C5C' },
+  purple: { light: '#D6BCFA', dark: '#9B87F5' },
+  blue: { light: '#BEE3F8', dark: '#3182CE' }
+};
 
 const ChessBoard: React.FC<ChessBoardProps> = ({
   board,
@@ -21,6 +35,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
   onSquareClick,
   whiteInCheck,
   blackInCheck,
+  boardTheme = "classic",
+  pieceSet = "standard"
 }) => {
   const [flipped, setFlipped] = useState(false);
   
@@ -56,32 +72,51 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     const showRank = displayCol === 0;
     const showFile = displayRow === 7;
     
+    // Get theme colors
+    const theme = boardThemes[boardTheme] || boardThemes.classic;
+    const squareColor = isLight ? theme.light : theme.dark;
+
     return (
-      <div 
+      <motion.div 
         key={`${row}-${col}`}
         className={`
           relative w-full aspect-square
-          ${isLight ? 'bg-chessWhite' : 'bg-chessDark'}
-          ${isSelected ? 'ring-2 ring-primary' : ''}
+          ${isSelected ? 'ring-2 ring-primary shadow-inner' : ''}
           transition-all duration-150
         `}
+        style={{ backgroundColor: squareColor }}
         onClick={() => onSquareClick(row, col)}
+        whileHover={{ 
+          scale: piece || isLegal ? 0.95 : 1,
+          boxShadow: piece || isLegal ? "0 0 8px rgba(0,0,0,0.3)" : "none" 
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
         {isLegal && (
-          <div className={`
-            absolute inset-0 bg-chessLegalMove rounded-full m-auto
-            ${piece ? 'w-full h-full' : 'w-1/4 h-1/4'}
-          `} />
+          <motion.div 
+            className={`
+              absolute inset-0 rounded-full m-auto z-10
+              ${piece ? 'w-full h-full rounded-none border-2 border-primary/70' : 'w-1/4 h-1/4 bg-primary/40'}
+            `}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+          />
         )}
         
         {inCheck && (
-          <div className="absolute inset-0 bg-chessCheck" />
+          <motion.div 
+            className="absolute inset-0 bg-red-500/30 z-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ repeat: Infinity, repeatType: "reverse", duration: 0.8 }}
+          />
         )}
         
         {showRank && (
           <span className={`
-            absolute top-0.5 left-0.5 text-xs font-bold
-            ${isLight ? 'text-chessDark' : 'text-chessWhite'}
+            absolute top-0.5 left-0.5 text-xs font-bold z-20
+            ${isLight ? 'text-black/70' : 'text-white/70'}
           `}>
             {ranks[displayRow]}
           </span>
@@ -89,15 +124,17 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         
         {showFile && (
           <span className={`
-            absolute bottom-0.5 right-0.5 text-xs font-bold
-            ${isLight ? 'text-chessDark' : 'text-chessWhite'}
+            absolute bottom-0.5 right-0.5 text-xs font-bold z-20
+            ${isLight ? 'text-black/70' : 'text-white/70'}
           `}>
             {files[displayCol]}
           </span>
         )}
         
-        {piece && <ChessPieceComponent piece={piece} />}
-      </div>
+        {piece && (
+          <ChessPieceComponent piece={piece} pieceSet={pieceSet} />
+        )}
+      </motion.div>
     );
   };
   
@@ -111,17 +148,24 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
   }
   
   return (
-    <div className="relative w-full max-w-md mx-auto">
-      <div className="chessboard-grid">{squares}</div>
+    <motion.div 
+      className="relative w-full max-w-md mx-auto"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="chessboard-grid rounded-lg overflow-hidden shadow-xl">{squares}</div>
       <div className="mt-2 flex justify-center">
-        <button
+        <motion.button
           onClick={() => setFlipped(!flipped)}
           className="px-3 py-1 text-sm bg-secondary rounded-md hover:bg-secondary/80 transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           Flip Board
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
