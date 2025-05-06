@@ -40,9 +40,12 @@ Designed as a final-year project, it combines smooth animations, modern UI, and 
 
 ## 📷 Screenshots
 
-| Home Page         | Play Chess        | 404 Page        |
-|-------------------|-------------------|-----------------|
-| ![Home](screenshots/home.png) | ![Play](screenshots/play.png) | ![404](screenshots/404.png) |
+| Home Page                                                                                | Play Chess                                                                               |LeaderBoard      |
+|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|-----------------|
+| ![image](https://github.com/user-attachments/assets/60da81aa-7d50-4734-9a47-b0b38cf75cff)  ![image](https://github.com/user-attachments/assets/420e0109-e042-41ce-9091-03e5cf1d78d3)  ![image](https://github.com/user-attachments/assets/68fdfb84-eca7-4763-a847-162de58b9e93)
+
+
+ |
 
 ---
 
