@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Chess specific colors
+				chessWhite: '#F0D9B5',
+				chessDark: '#B58863',
+				chessHighlight: 'rgba(255, 255, 0, 0.4)',
+				chessLegalMove: 'rgba(0, 128, 0, 0.3)',
+				chessSelected: 'rgba(0, 0, 255, 0.3)',
+				chessCheck: 'rgba(255, 0, 0, 0.5)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +92,32 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'piece-move': {
+					'0%': { transform: 'translate(0, 0)' },
+					'100%': { transform: 'translate(var(--dx), var(--dy))' }
+				},
+				'winner-celebration': {
+					'0%': { transform: 'scale(1)', opacity: '0' },
+					'50%': { transform: 'scale(1.2)', opacity: '1' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'float-in': {
+					'0%': { transform: 'translateY(20px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'piece-move': 'piece-move 0.3s ease-out forwards',
+				'winner-celebration': 'winner-celebration 1s ease-out',
+				'fade-in': 'fade-in 0.5s ease-out',
+				'float-in': 'float-in 0.5s ease-out'
 			}
 		}
 	},
