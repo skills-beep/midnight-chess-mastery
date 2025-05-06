@@ -40,14 +40,21 @@ Designed as a final-year project, it combines smooth animations, modern UI, and 
 
 ## 📷 Screenshots
 
-| Home Page                                                                                | Play Chess                                                                               |LeaderBoard      |
-|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|-----------------|
-| ![image](https://github.com/user-attachments/assets/60da81aa-7d50-4734-9a47-b0b38cf75cff)  ![image](https://github.com/user-attachments/assets/420e0109-e042-41ce-9091-03e5cf1d78d3)  ![image](https://github.com/user-attachments/assets/68fdfb84-eca7-4763-a847-162de58b9e93)
+Home Page,Game Page,LeaderBoard(Dark Mode)                                                                      
+| ![image](https://github.com/user-attachments/assets/60da81aa-7d50-4734-9a47-b0b38cf75cff) 
+![image](https://github.com/user-attachments/assets/80ef9442-7ae1-4fd2-98ea-5bcda997f5e7)
+
+![image](https://github.com/user-attachments/assets/420e0109-e042-41ce-9091-03e5cf1d78d3) 
+![image](https://github.com/user-attachments/assets/68fdfb84-eca7-4763-a847-162de58b9e93)
+
+Light Mode
+![image](https://github.com/user-attachments/assets/f0766157-f44e-4f84-bac3-6d816b920f40)
+![image](https://github.com/user-attachments/assets/79158f19-90a1-47a8-87ac-f359821ba1c8)
+![Uploading image.png…]()
 
 
- |
 
----
+
 
 ## 📈 Roadmap
 
