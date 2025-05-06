@@ -71,7 +71,7 @@ Light Mode
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/chess-master.git
+git clone https://github.com/skills-beep/chess-master.git
 
 # Navigate into the folder
 cd chess-master
