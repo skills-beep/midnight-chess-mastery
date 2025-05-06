@@ -5,7 +5,7 @@ import ChessTimer from "@/components/ChessTimer";
 import MoveHistory from "@/components/MoveHistory";
 import GameControls from "@/components/GameControls";
 import WinnerModal from "@/components/WinnerModal";
-import { initialGameState, GameState, makeMove, getLegalMoves, generateAiMove } from "@/lib/chess-engine";
+import { initialGameState, GameState, makeMove, getLegalMoves, generateAiMove, PieceColor } from "@/lib/chess-engine";
 import { useTheme } from "@/components/ThemeProvider";
 
 const Play = () => {
@@ -103,7 +103,7 @@ const Play = () => {
     
     // Reconstruct the board from the initial state and moves
     let newBoard = initialGameState().board;
-    let newCurrentPlayer = 'white';
+    let newCurrentPlayer: PieceColor = 'white';
     
     for (const move of newMoves) {
       const { from, to } = move;
