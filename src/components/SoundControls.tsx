@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { 
@@ -13,12 +13,83 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import SoundManager from "@/utils/soundManager";
 
 export default function SoundControls() {
   const [sfxVolume, setSfxVolume] = useState(70);
   const [musicVolume, setMusicVolume] = useState(30);
   const [sfxMuted, setSfxMuted] = useState(false);
   const [musicMuted, setMusicMuted] = useState(false);
+  
+  // Initialize sound manager
+  useEffect(() => {
+    const soundManager = SoundManager.getInstance();
+    
+    // Set initial values from sound manager
+    setSfxVolume(soundManager.getSfxVolume());
+    setMusicVolume(soundManager.getMusicVolume());
+    setSfxMuted(soundManager.isSfxMuted());
+    setMusicMuted(soundManager.isMusicMuted());
+    
+    // Start playing background music when component mounts
+    if (!soundManager.isMusicMuted()) {
+      soundManager.playMusic();
+    }
+    
+    // Clean up when component unmounts
+    return () => {
+      soundManager.pauseMusic();
+    };
+  }, []);
+  
+  const handleSfxVolumeChange = (val: number[]) => {
+    const volume = val[0];
+    setSfxVolume(volume);
+    const soundManager = SoundManager.getInstance();
+    soundManager.setSfxVolume(volume);
+    
+    if (volume === 0) {
+      setSfxMuted(true);
+      soundManager.toggleSfxMute(true);
+    } else if (sfxMuted) {
+      setSfxMuted(false);
+      soundManager.toggleSfxMute(false);
+    }
+    
+    // Play a sound effect to demonstrate volume change
+    if (volume > 0) {
+      soundManager.playSoundEffect('move');
+    }
+  };
+  
+  const handleMusicVolumeChange = (val: number[]) => {
+    const volume = val[0];
+    setMusicVolume(volume);
+    const soundManager = SoundManager.getInstance();
+    soundManager.setMusicVolume(volume);
+    
+    if (volume === 0) {
+      setMusicMuted(true);
+      soundManager.toggleMusicMute(true);
+    } else if (musicMuted) {
+      setMusicMuted(false);
+      soundManager.toggleMusicMute(false);
+    }
+  };
+  
+  const handleSfxMuteToggle = () => {
+    const newMuteState = !sfxMuted;
+    setSfxMuted(newMuteState);
+    const soundManager = SoundManager.getInstance();
+    soundManager.toggleSfxMute(newMuteState);
+  };
+  
+  const handleMusicMuteToggle = () => {
+    const newMuteState = !musicMuted;
+    setMusicMuted(newMuteState);
+    const soundManager = SoundManager.getInstance();
+    soundManager.toggleMusicMute(newMuteState);
+  };
   
   return (
     <div className="flex gap-6">
@@ -31,7 +102,7 @@ export default function SoundControls() {
                 variant="ghost" 
                 size="icon" 
                 className="h-7 w-7" 
-                onClick={() => setSfxMuted(!sfxMuted)}
+                onClick={handleSfxMuteToggle}
               >
                 {sfxMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </Button>
@@ -46,11 +117,7 @@ export default function SoundControls() {
           min={0} 
           max={100} 
           step={1}
-          onValueChange={(val) => {
-            setSfxVolume(val[0]);
-            if (val[0] === 0) setSfxMuted(true);
-            else if (sfxMuted) setSfxMuted(false);
-          }}
+          onValueChange={handleSfxVolumeChange}
         />
       </div>
       
@@ -63,7 +130,7 @@ export default function SoundControls() {
                 variant="ghost" 
                 size="icon" 
                 className="h-7 w-7" 
-                onClick={() => setMusicMuted(!musicMuted)}
+                onClick={handleMusicMuteToggle}
               >
                 {musicMuted ? <Music2 className="h-4 w-4" /> : <Music className="h-4 w-4" />}
               </Button>
@@ -78,11 +145,7 @@ export default function SoundControls() {
           min={0} 
           max={100} 
           step={1}
-          onValueChange={(val) => {
-            setMusicVolume(val[0]);
-            if (val[0] === 0) setMusicMuted(true);
-            else if (musicMuted) setMusicMuted(false);
-          }}
+          onValueChange={handleMusicVolumeChange}
         />
       </div>
     </div>

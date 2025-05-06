@@ -3,6 +3,7 @@ import React from "react";
 import { ChessPiece } from "@/lib/chess-engine";
 import { PieceSet } from "./ThemeCustomizer";
 import { motion } from "framer-motion";
+import SoundManager from "@/utils/soundManager";
 
 interface ChessPieceProps {
   piece: ChessPiece;
@@ -103,6 +104,12 @@ const ChessPieceComponent: React.FC<ChessPieceProps> = ({ piece, pieceSet = "sta
         return `${baseStyle} text-4xl ${piece.color === 'white' ? 'text-white drop-shadow-md' : 'text-black drop-shadow-sm'}`;
     }
   };
+
+  // Play sound when piece appears (happens when a move is made)
+  React.useEffect(() => {
+    const soundManager = SoundManager.getInstance();
+    soundManager.playSoundEffect('move');
+  }, []);
 
   return (
     <motion.div 
