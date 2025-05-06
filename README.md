@@ -50,7 +50,7 @@ Home Page,Game Page,LeaderBoard(Dark Mode)
 Light Mode
 ![image](https://github.com/user-attachments/assets/f0766157-f44e-4f84-bac3-6d816b920f40)
 ![image](https://github.com/user-attachments/assets/79158f19-90a1-47a8-87ac-f359821ba1c8)
-![Uploading image.png…]()
+
 
 
 
