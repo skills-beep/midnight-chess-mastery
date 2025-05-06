@@ -1,8 +1,8 @@
-
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart2 } from "lucide-react";
+import { ChessMove } from "@/lib/chess-engine";
 
 import {
   AreaChart,
@@ -16,15 +16,6 @@ import {
   Bar,
   Legend
 } from 'recharts';
-
-interface ChessMove {
-  from: { row: number; col: number };
-  to: { row: number; col: number };
-  piece?: string;
-  notation: string;
-  evaluation?: number;
-  suggestion?: string;
-}
 
 interface GameStats {
   accuracy: {
