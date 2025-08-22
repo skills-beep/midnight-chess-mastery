@@ -4,9 +4,8 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { motion } from "framer-motion";
-import { Settings } from "lucide-react";
-
-export type AIDifficulty = 'easy' | 'medium' | 'hard';
+import { Settings, Trophy } from "lucide-react";
+import { AIDifficulty, getAiRating } from "@/lib/chess-engine";
 
 interface AISettingsProps {
   currentDifficulty: AIDifficulty;
@@ -56,12 +55,34 @@ export default function AISettings({ currentDifficulty, onDifficultyChange }: AI
                 </div>
               </Label>
             </div>
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="expert" id="expert" />
+              <Label htmlFor="expert" className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span>Expert</span>
+                    <Trophy className="h-3 w-3 text-yellow-500" />
+                  </div>
+                  <DifficultyBars level={4} />
+                </div>
+              </Label>
+            </div>
           </RadioGroup>
           
-          <div className="text-sm text-muted-foreground">
-            {currentDifficulty === 'easy' && "Perfect for beginners or casual play."}
-            {currentDifficulty === 'medium' && "Balanced challenge for intermediate players."}
-            {currentDifficulty === 'hard' && "Prepare for a tough match against our advanced AI!"}
+          <div className="text-sm text-muted-foreground space-y-2">
+            <div>
+              {currentDifficulty === 'easy' && "Perfect for beginners or casual play."}
+              {currentDifficulty === 'medium' && "Balanced challenge for intermediate players."}
+              {currentDifficulty === 'hard' && "Prepare for a tough match against our advanced AI!"}
+              {currentDifficulty === 'expert' && "Master-level AI that will challenge even experienced players."}
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="font-medium">AI Rating:</span>
+              <span className="px-2 py-1 bg-muted rounded text-foreground font-mono">
+                {getAiRating(currentDifficulty)}
+              </span>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -69,10 +90,10 @@ export default function AISettings({ currentDifficulty, onDifficultyChange }: AI
   );
 }
 
-function DifficultyBars({ level }: { level: 1 | 2 | 3 }) {
+function DifficultyBars({ level }: { level: 1 | 2 | 3 | 4 }) {
   return (
     <div className="flex items-center gap-1">
-      {[1, 2, 3].map((bar) => (
+      {[1, 2, 3, 4].map((bar) => (
         <motion.div
           key={bar}
           initial={{ height: 0 }}
@@ -84,7 +105,9 @@ function DifficultyBars({ level }: { level: 1 | 2 | 3 }) {
                 ? 'bg-green-500' 
                 : bar === 2 
                   ? 'bg-yellow-500' 
-                  : 'bg-red-500'
+                  : bar === 3
+                    ? 'bg-red-500'
+                    : 'bg-purple-500'
               : 'bg-muted'
           }`}
         />

@@ -22,3 +22,40 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Clacky-related configuration
+.clackyai/
+.1024
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Framework-related files (React/Vite)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Package manager
+package-lock.json.bak
+yarn.lock
+pnpm-lock.yaml
+bun.lockb.bak
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache

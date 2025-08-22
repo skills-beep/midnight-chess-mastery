@@ -25,6 +25,8 @@ export interface ChessMove {
 export type ChessBoard = (ChessPiece | null)[][];
 
 export type GameStatus = 'playing' | 'check' | 'checkmate' | 'stalemate' | 'draw';
+export type GameMode = 'single' | 'multiplayer' | 'ai';
+export type TimeControl = 'blitz' | 'rapid' | 'classical' | 'bullet';
 
 export interface GameState {
   board: ChessBoard;
@@ -416,36 +418,220 @@ export const makeMove = (
   };
 };
 
-// Generate a simple AI move
-export const generateAiMove = (gameState: GameState): { from: ChessSquare, to: ChessSquare } | null => {
-  const { board, currentPlayer } = gameState;
-  const aiPieces: { piece: ChessPiece, row: number, col: number }[] = [];
+export type AIDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
+
+// Piece values for evaluation
+const PIECE_VALUES = {
+  pawn: 1,
+  knight: 3,
+  bishop: 3,
+  rook: 5,
+  queen: 9,
+  king: 0
+};
+
+// Position evaluation tables
+const PAWN_TABLE = [
+  [0,  0,  0,  0,  0,  0,  0,  0],
+  [50, 50, 50, 50, 50, 50, 50, 50],
+  [10, 10, 20, 30, 30, 20, 10, 10],
+  [5,  5, 10, 25, 25, 10,  5,  5],
+  [0,  0,  0, 20, 20,  0,  0,  0],
+  [5, -5,-10,  0,  0,-10, -5,  5],
+  [5, 10, 10,-20,-20, 10, 10,  5],
+  [0,  0,  0,  0,  0,  0,  0,  0]
+];
+
+const KNIGHT_TABLE = [
+  [-50,-40,-30,-30,-30,-30,-40,-50],
+  [-40,-20,  0,  0,  0,  0,-20,-40],
+  [-30,  0, 10, 15, 15, 10,  0,-30],
+  [-30,  5, 15, 20, 20, 15,  5,-30],
+  [-30,  0, 15, 20, 20, 15,  0,-30],
+  [-30,  5, 10, 15, 15, 10,  5,-30],
+  [-40,-20,  0,  5,  5,  0,-20,-40],
+  [-50,-40,-30,-30,-30,-30,-40,-50]
+];
+
+// Evaluate board position
+const evaluateBoard = (board: ChessBoard, color: PieceColor): number => {
+  let score = 0;
   
-  // Find all AI pieces
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const piece = board[row][col];
-      if (piece && piece.color === currentPlayer) {
-        aiPieces.push({ piece, row, col });
+      if (!piece) continue;
+      
+      let pieceValue = PIECE_VALUES[piece.type];
+      
+      // Add positional bonuses
+      if (piece.type === 'pawn') {
+        pieceValue += PAWN_TABLE[piece.color === 'white' ? row : 7 - row][col] / 100;
+      } else if (piece.type === 'knight') {
+        pieceValue += KNIGHT_TABLE[piece.color === 'white' ? row : 7 - row][col] / 100;
+      }
+      
+      // Center control bonus
+      if ((row >= 3 && row <= 4) && (col >= 3 && col <= 4)) {
+        pieceValue += 0.3;
+      }
+      
+      if (piece.color === color) {
+        score += pieceValue;
+      } else {
+        score -= pieceValue;
       }
     }
   }
   
-  // Shuffle the pieces array
-  const shuffledPieces = [...aiPieces].sort(() => Math.random() - 0.5);
+  return score;
+};
+
+// Minimax algorithm with alpha-beta pruning
+const minimax = (
+  gameState: GameState,
+  depth: number,
+  alpha: number,
+  beta: number,
+  maximizingPlayer: boolean,
+  aiColor: PieceColor
+): { score: number, move?: { from: ChessSquare, to: ChessSquare } } => {
+  if (depth === 0 || gameState.status !== 'playing') {
+    return { score: evaluateBoard(gameState.board, aiColor) };
+  }
   
-  // Try to find a piece with legal moves
-  for (const { row, col } of shuffledPieces) {
-    const legalMoves = getLegalMoves(board, row, col);
-    if (legalMoves.length > 0) {
-      // Choose a random legal move
-      const targetMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
-      return {
-        from: { row, col },
-        to: targetMove
-      };
+  const allMoves = getAllPossibleMoves(gameState.board, gameState.currentPlayer);
+  
+  if (maximizingPlayer) {
+    let maxEval = -Infinity;
+    let bestMove: { from: ChessSquare, to: ChessSquare } | undefined;
+    
+    for (const move of allMoves) {
+      const newGameState = makeMove(gameState, move.from, move.to);
+      const evaluation = minimax(newGameState, depth - 1, alpha, beta, false, aiColor);
+      
+      if (evaluation.score > maxEval) {
+        maxEval = evaluation.score;
+        bestMove = move;
+      }
+      
+      alpha = Math.max(alpha, evaluation.score);
+      if (beta <= alpha) break; // Alpha-beta pruning
+    }
+    
+    return { score: maxEval, move: bestMove };
+  } else {
+    let minEval = Infinity;
+    let bestMove: { from: ChessSquare, to: ChessSquare } | undefined;
+    
+    for (const move of allMoves) {
+      const newGameState = makeMove(gameState, move.from, move.to);
+      const evaluation = minimax(newGameState, depth - 1, alpha, beta, true, aiColor);
+      
+      if (evaluation.score < minEval) {
+        minEval = evaluation.score;
+        bestMove = move;
+      }
+      
+      beta = Math.min(beta, evaluation.score);
+      if (beta <= alpha) break; // Alpha-beta pruning
+    }
+    
+    return { score: minEval, move: bestMove };
+  }
+};
+
+// Get all possible moves for a color
+const getAllPossibleMoves = (board: ChessBoard, color: PieceColor): { from: ChessSquare, to: ChessSquare }[] => {
+  const moves: { from: ChessSquare, to: ChessSquare }[] = [];
+  
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece.color === color) {
+        const legalMoves = getLegalMoves(board, row, col);
+        for (const move of legalMoves) {
+          moves.push({ from: { row, col }, to: move });
+        }
+      }
     }
   }
   
-  return null;
+  return moves;
+};
+
+// Enhanced AI move generation with difficulty levels
+export const generateAiMove = (
+  gameState: GameState,
+  difficulty: AIDifficulty = 'medium'
+): { from: ChessSquare, to: ChessSquare } | null => {
+  const { board, currentPlayer } = gameState;
+  
+  // Get all possible moves
+  const allMoves = getAllPossibleMoves(board, currentPlayer);
+  if (allMoves.length === 0) return null;
+  
+  switch (difficulty) {
+    case 'easy': {
+      // 70% random moves, 30% slightly better moves
+      if (Math.random() < 0.7) {
+        return allMoves[Math.floor(Math.random() * allMoves.length)];
+      }
+      
+      // Simple heuristic: prefer captures
+      const captureMoves = allMoves.filter(move => 
+        board[move.to.row][move.to.col] !== null
+      );
+      
+      if (captureMoves.length > 0) {
+        return captureMoves[Math.floor(Math.random() * captureMoves.length)];
+      }
+      return allMoves[Math.floor(Math.random() * allMoves.length)];
+    }
+    
+    case 'medium': {
+      // Use minimax with depth 2
+      const result = minimax(gameState, 2, -Infinity, Infinity, true, currentPlayer);
+      return result.move || allMoves[Math.floor(Math.random() * allMoves.length)];
+    }
+    
+    case 'hard': {
+      // Use minimax with depth 3, with some randomness
+      const result = minimax(gameState, 3, -Infinity, Infinity, true, currentPlayer);
+      
+      // 90% best move, 10% second best for unpredictability
+      if (Math.random() < 0.9) {
+        return result.move || allMoves[Math.floor(Math.random() * allMoves.length)];
+      }
+      
+      // Find second best move
+      const moves = allMoves.map(move => {
+        const newGameState = makeMove(gameState, move.from, move.to);
+        const score = evaluateBoard(newGameState.board, currentPlayer);
+        return { move, score };
+      }).sort((a, b) => b.score - a.score);
+      
+      return moves[1]?.move || moves[0]?.move || null;
+    }
+    
+    case 'expert': {
+      // Use minimax with depth 4
+      const result = minimax(gameState, 4, -Infinity, Infinity, true, currentPlayer);
+      return result.move || allMoves[Math.floor(Math.random() * allMoves.length)];
+    }
+    
+    default:
+      return allMoves[Math.floor(Math.random() * allMoves.length)];
+  }
+};
+
+// Get AI opponent rating based on difficulty
+export const getAiRating = (difficulty: AIDifficulty): number => {
+  switch (difficulty) {
+    case 'easy': return 800;
+    case 'medium': return 1200;
+    case 'hard': return 1600;
+    case 'expert': return 2000;
+    default: return 1200;
+  }
 };
